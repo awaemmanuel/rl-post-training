@@ -11,3 +11,9 @@ wheels/
 
 # Private memory / assets (own nested private git repo, never in public repo)
 .claude/
+
+# Training artifacts and experiment logs
+outputs/
+wandb/
+*.ckpt
+*.safetensors
