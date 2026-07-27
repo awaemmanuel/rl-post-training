@@ -1,0 +1,52 @@
+# Phase 1 — DPO config.
+# LESSON FOCUS: beta and the reference model are the whole game. Ablate `beta`
+# and `learning_rate` first; watch reward margin AND KL together.
+
+# Models
+# Start from the SFT checkpoint (the policy). The reference defaults to the same
+# weights frozen at init (standard DPO). trl handles the reference internally.
+model_name: outputs/sft-qwen2.5-1.5b   # path to your SFT output (or a base model)
+trust_remote_code: true
+
+# Datasets
+# A preference dataset with `chosen`/`rejected` (or convertible to it).
+dataset_name: HuggingFaceH4/ultrafeedback_binarized
+dataset_split: train_prefs
+eval_split: test_prefs
+max_samples: 15000          # cap for cheap iteration; null for full
+max_prompt_length: 512
+max_length: 1024
+
+# LoRA (PEFT)
+use_lora: true
+load_in_4bit: false
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+lora_target_modules: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
+
+# DPO objective
+loss_type: sigmoid          # sigmoid=DPO. Try: ipo, hinge; SimPO/ORPO via their trainers.
+beta: 0.1                   # KEY KNOB. Lower = drifts further from ref. Ablate: 0.05, 0.1, 0.5.
+
+# Training
+output_dir: outputs/dpo-qwen2.5-1.5b
+num_train_epochs: 1
+per_device_train_batch_size: 2
+gradient_accumulation_steps: 8
+learning_rate: 5.0e-6       # KEY KNOB. DPO wants a smaller lr than SFT. Ablate: 1e-6..1e-5.
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+weight_decay: 0.0
+bf16: true
+gradient_checkpointing: true
+logging_steps: 10
+eval_strategy: steps
+eval_steps: 100
+save_strategy: epoch
+seed: 42
+
+# Tracking
+report_to: wandb
+wandb_project: rl-post-training-phase1
+run_name: dpo-qwen2.5-1.5b-beta0.1

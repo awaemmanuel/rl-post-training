@@ -1,0 +1,41 @@
+# Phase 1 — SFT config (LoRA on Qwen2.5-1.5B).
+# Every knob here is something to understand; change one at a time and log results.
+
+# Models
+model_name: Qwen/Qwen2.5-1.5B-Instruct
+trust_remote_code: true
+
+# Datasets
+# An instruction dataset in chat format. Swap freely; keep it small to iterate.
+dataset_name: HuggingFaceH4/ultrachat_200k
+dataset_split: train_sft
+max_samples: 20000          # cap for cheap iteration; set null for full
+max_seq_length: 1024
+
+# LoRA (PEFT)
+use_lora: true
+load_in_4bit: false         # set true for QLoRA on smaller GPUs
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+lora_target_modules: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
+
+# Training
+output_dir: outputs/sft-qwen2.5-1.5b
+num_train_epochs: 1
+per_device_train_batch_size: 4
+gradient_accumulation_steps: 4
+learning_rate: 2.0e-5
+lr_scheduler_type: cosine
+warmup_ratio: 0.03
+weight_decay: 0.0
+bf16: true
+gradient_checkpointing: true
+logging_steps: 10
+save_strategy: epoch
+seed: 42
+
+# Tracking
+report_to: wandb            # set to "none" to disable
+wandb_project: rl-post-training-phase1
+run_name: sft-qwen2.5-1.5b
