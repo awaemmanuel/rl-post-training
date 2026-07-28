@@ -68,7 +68,6 @@ credit assignment and environment/reward design.
 rl-post-training/
 ├── README.md            # this file
 ├── ROADMAP.md           # detailed 4-phase, week-by-week plan
-├── MONETIZATION.md      # approach for sharing lessons across channels
 ├── pyproject.toml       # uv-managed Python project
 ├── main.py
 └── phase{1..4}-*/       # one repo per phase (added as work progresses)
