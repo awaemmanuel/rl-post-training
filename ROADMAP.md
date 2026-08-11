@@ -141,7 +141,7 @@ analysis of what the RL learned and where it breaks.
 
 ## Inference Engineering Track (parallel to Phases 1-4)
 
-Motivation: the target role is **AI Inference AND Post-Training** (e.g. Baseten).
+Motivation: real capability in this field spans **inference AND post-training**.
 The post-training phases above are inference-light; this track fills that gap. It
 also reinforces the RL work directly, because in online RL (Phases 2-3) rollout
 generation is the throughput bottleneck. Understanding inference makes you faster
@@ -185,8 +185,8 @@ with the ClipForge project.
 
 **Primary reference (confirmed):** *Inference Engineering* by Philip Kiely
 (Baseten Books, 2026). https://www.baseten.co/library/inference-engineering/
-This is the book the friend (hired into "AI Inference & Post-Training @ Baseten")
-said was all he read. Still ask him what the interviews actually tested.
+Recommended by a friend working in inference + post-training. The goal here is to
+genuinely learn the material by doing the experiments, not to prep for interviews.
 
 **Community outline (inspiration, do not copy):**
 github.com/elizabetht/100-days-of-inference is a 100-day, runnable study log built
