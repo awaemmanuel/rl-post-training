@@ -5,13 +5,16 @@ description = "Hands-on RL post-training and agentic RL projects."
 readme = "README.md"
 requires-python = ">=3.11.7"
 dependencies = [
-    # Core training stack (Phase 1: SFT + DPO)
-    "torch>=2.4.0",
-    "transformers>=4.45.0",
-    "trl>=0.11.0",
-    "peft>=0.13.0",
-    "datasets>=3.0.0",
-    "accelerate>=1.0.0",
+    # Core training stack (Phase 1: SFT + DPO).
+    # Versions are pinned to a stable, widely-documented set. TRL moves fast and
+    # its config API changed a lot in 1.x/transformers 5.x; 0.12.x matches the
+    # scripts and most community tutorials.
+    "torch>=2.4.0,<2.6.0",
+    "transformers>=4.46.0,<4.48.0",
+    "trl>=0.12.0,<0.13.0",
+    "peft>=0.13.0,<0.15.0",
+    "datasets>=3.0.0,<3.3.0",
+    "accelerate>=1.0.0,<1.4.0",
     "bitsandbytes>=0.44.0",  # QLoRA 4-bit quantization
     # Experiment tracking + eval
     "wandb>=0.18.0",
