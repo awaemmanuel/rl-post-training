@@ -27,11 +27,28 @@ IDLE_MINUTES=${IDLE_MINUTES}
 idle_count=0
 
 while true; do
-  # Average GPU utilization across all GPUs (integer percent).
-  util="\$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits 2>/dev/null \
-    | awk '{s+=\$1; n++} END { if (n>0) printf "%d", s/n; else print 100 }')"
+  # Fail-safe: if nvidia-smi is missing or errors (e.g. driver still installing),
+  # treat the VM as BUSY so we never shut down during setup. Only a real, valid
+  # low-utilization reading counts as idle.
+  if ! command -v nvidia-smi >/dev/null 2>&1; then
+    logger -t idle-shutdown "nvidia-smi not present yet; treating as BUSY"
+    idle_count=0
+    sleep 60
+    continue
+  fi
 
-  if [ "\${util:-100}" -lt "\$THRESHOLD" ]; then
+  raw="\$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits 2>/dev/null)"
+  # Average across GPUs. If output is empty/non-numeric, util stays empty.
+  util="\$(echo "\$raw" | awk 'BEGIN{s=0;n=0} /^[0-9]+\$/{s+=\$1;n++} END{ if (n>0) printf "%d", s/n }')"
+
+  if ! [[ "\$util" =~ ^[0-9]+\$ ]]; then
+    logger -t idle-shutdown "no valid GPU reading (raw='\$raw'); treating as BUSY"
+    idle_count=0
+    sleep 60
+    continue
+  fi
+
+  if [ "\$util" -lt "\$THRESHOLD" ]; then
     idle_count=\$((idle_count + 1))
   else
     idle_count=0

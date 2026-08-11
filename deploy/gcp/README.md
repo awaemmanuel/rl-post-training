@@ -15,10 +15,14 @@ The A100 VM used for hands-on Phase 1+ training.
 ## Cost safety (two layers)
 
 1. **Idle auto-shutdown watchdog** (`idle-shutdown-startup.sh`): a systemd service
-   checks GPU utilization every minute and STOPS the VM after 30 consecutive
-   minutes below 15% util. Training keeps the GPU busy, so it will not fire
-   mid-run. Tunable via instance metadata:
+   checks GPU utilization every minute and STOPS the VM after N consecutive
+   minutes below 15% util (default 45). Training keeps the GPU busy, so it will
+   not fire mid-run. Tunable via instance metadata:
    `idle-shutdown-minutes`, `idle-shutdown-threshold-percent`.
+   FAIL-SAFE: if `nvidia-smi` is missing or returns no valid reading (e.g. driver
+   still installing), it treats the VM as BUSY and will NOT shut down. (An earlier
+   version had a bug where the driver-install period read as 0% idle and stopped
+   the VM mid-setup; fixed.)
 2. **Max-run backstop**: `--max-run-duration=8h --instance-termination-action=STOP`
    stops the VM after 8h even if the watchdog fails.
 
