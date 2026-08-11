@@ -2,6 +2,8 @@
 
 A 3–6 month, ~10–15 hrs/week plan to build **frontier-lab-grade** hands-on skills
 in RL post-training and agentic RL, and to capture the lessons learned along the way.
+A parallel **Inference Engineering Track** (see below) targets roles that combine
+inference and post-training (e.g. Baseten's "AI Inference & Post-Training").
 
 > **North star:** The real skill is *making RL training actually work* —
 > diagnosing reward hacking, KL blowups, collapse, and throughput bottlenecks,
@@ -137,6 +139,62 @@ analysis of what the RL learned and where it breaks.
 
 ---
 
+## Inference Engineering Track (parallel to Phases 1-4)
+
+Motivation: the target role is **AI Inference AND Post-Training** (e.g. Baseten).
+The post-training phases above are inference-light; this track fills that gap. It
+also reinforces the RL work directly, because in online RL (Phases 2-3) rollout
+generation is the throughput bottleneck. Understanding inference makes you faster
+at training, not just serving.
+
+Run this track alongside the phases (a few hours per week), not after them.
+
+### Track A: Serving fundamentals (with Phase 1-2)
+- Latency vs throughput, and why they trade off.
+- Why generation is far more expensive than prompt processing (autoregressive,
+  stateless transformers). See the PyTorch primer's generation-cost appendix.
+- KV cache: what it stores, why it dominates memory, how it bounds batch size.
+- Continuous/dynamic batching (the core idea behind vLLM throughput).
+- Deliverable: a short latency/throughput benchmark of one small model with a
+  writeup of the tradeoff curve.
+
+### Track B: vLLM internals (with Phase 2-3)
+- You already use vLLM for rollouts; now read how it works.
+- PagedAttention, the KV cache manager, scheduler, and how batching is done.
+- Measure tokens/sec vs batch size and sequence length; find the knee.
+- Deliverable: annotate your Phase 3 rollout throughput; explain the bottleneck.
+
+### Track C: Optimization techniques (with Phase 3-4)
+- Quantization (INT8/FP8/AWQ/GPTQ): quality vs speed vs memory.
+- Speculative decoding: draft model + verify, when it helps.
+- TensorRT-LLM and compiled kernels (awareness level; deep-dive optional).
+- Cost-per-token economics: how serving decisions map to dollars.
+- Deliverable: quantize one trained checkpoint, measure quality/latency/memory.
+
+### Track D: Packaging and deployment (capstone, optional)
+- Package a trained checkpoint for serving (e.g. Baseten Truss or a vLLM server).
+- Autoscaling, cold starts, scale-to-zero tradeoffs (concepts).
+- Deliverable: deploy one of your fine-tuned models behind an API and document it.
+
+The book itself frames inference as three layers, which map onto the tracks above:
+Runtime (single-GPU: KV cache, kernels, vLLM/SGLang/TensorRT-LLM, quantization,
+speculative decoding, parallelism) -> Infrastructure (multi-GPU: autoscaling,
+routing, multi-cloud, zero-downtime deploy) -> Tooling (benchmarking, observability,
+clients). Its modalities chapter (VLM, ASR/Whisper, TTS, video) overlaps directly
+with the ClipForge project.
+
+**Primary reference (confirmed):** *Inference Engineering* by Philip Kiely
+(Baseten Books, 2026). https://www.baseten.co/library/inference-engineering/
+This is the book the friend (hired into "AI Inference & Post-Training @ Baseten")
+said was all he read. Still ask him what the interviews actually tested.
+
+**Community outline (inspiration, do not copy):**
+github.com/elizabetht/100-days-of-inference is a 100-day, runnable study log built
+around the same book (chapter-by-day mapping). Great for structure/ideas; do your
+own work and write your own notes.
+
+---
+
 ## Lessons-Learned Checklist (what "frontier-grade" looks like)
 
 - [ ] 4 clean, runnable repos with READMEs, fixed seeds, and one-command repro.
@@ -145,6 +203,8 @@ analysis of what the RL learned and where it breaks.
 - [ ] Documented failure war stories (reward hacking, KL blowup, collapse).
 - [ ] Proper eval: baselines, seeds, learning curves, not vibes.
 - [ ] Throughput awareness demonstrated (vLLM rollouts, batching).
+- [ ] Inference track: a latency/throughput benchmark + a quantized checkpoint.
+- [ ] Inference track: one fine-tuned model deployed behind an API (capstone).
 
 ## Learning Resources (to consult as you go)
 
@@ -152,6 +212,9 @@ analysis of what the RL learned and where it breaks.
   Constitutional AI, Tulu 3 (excellent recipes report).
 - Codebases to read: TRL, verl, OpenRLHF (read the trainers, not just run them).
 - Eval: `lm-evaluation-harness`, AlpacaEval, MT-Bench.
+- Inference: the Philip Kiely (Baseten) inference-engineering book (confirm title),
+  the PyTorch primer's generation-cost appendix, and the vLLM docs/paper
+  (PagedAttention).
 
 ## Stretch / "Stay Ahead" Ideas
 
